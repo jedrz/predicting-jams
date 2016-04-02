@@ -16,7 +16,7 @@ Jam = namedtuple('Jam', ['removed', 'in_20', 'in_40'])
 SimpleEdge = namedtuple('SimpleEdge', ['id1', 'id2'])
 
 
-def parse_stree_graph():
+def parse_street_graph():
     with open(STREET_GRAPH_PATH) as f:
         return parse_street_graph_lines(f.readlines())
 
@@ -72,9 +72,11 @@ def parse_simple_edge(simple_edge):
     return SimpleEdge._make(simple_edge)
 
 
-def display_map():
-    (nodes, edges) = parse_stree_graph()
-    node_dict = {n.id: n for n in nodes}
+def build_node_dict(nodes):
+    return {n.id: n for n in nodes}
+
+
+def display_map(node_dict, edges):
     x = []
     y = []
     for e in edges:
@@ -82,4 +84,33 @@ def display_map():
         n2 = node_dict[e.id2]
         x.extend([n1.long, n2.long])
         y.extend([n1.lat, n2.lat])
-    plt.plot(x, y, '.-')
+    plt.plot(x, y, '.-', c='g')
+
+
+def display_jam(jam, node_dict):
+    display_labels(jam.removed, 'r', node_dict)
+    display_labels(jam.in_20, 'f', node_dict)
+    display_labels(jam.in_40, 's', node_dict)
+
+
+def display_labels(edges, prefix, node_dict):
+    for i, e in enumerate(edges):
+        display_and_annote_node(node_dict[e.id1], prefix, i, True)
+        display_and_annote_node(node_dict[e.id2], prefix, i, False)
+
+
+def display_and_annote_node(node, prefix, index, should_annotate):
+    plt.scatter([node.long], [node.lat], s=100, c='r', marker='x')
+    if should_annotate:
+        plt.annotate('{}{}'.format(prefix, index), (node.long, node.lat))
+
+
+def display(should_display_map=False, should_display_jam=True, jam_index=0):
+    (nodes, edges) = parse_street_graph()
+    jam = parse_jams_data()[jam_index]
+    node_dict = build_node_dict(nodes)
+    if should_display_map:
+        display_map(node_dict, edges)
+    if should_display_jam:
+        display_jam(jam, node_dict)
+    plt.show()
