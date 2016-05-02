@@ -14,5 +14,6 @@ addons:
       - libpng-dev
       - libjpeg8-dev
       - libfreetype6-dev
+cache: pip
 notifications:
   email: false
