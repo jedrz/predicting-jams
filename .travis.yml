@@ -4,7 +4,10 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install matplotlib
+  - pip install pylint
 script: py.test
+after_success:
+  - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
 addons:
   apt:
     packages:
