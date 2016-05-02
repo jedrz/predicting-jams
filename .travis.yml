@@ -14,3 +14,5 @@ addons:
       - libpng-dev
       - libjpeg8-dev
       - libfreetype6-dev
+notifications:
+  email: false
