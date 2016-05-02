@@ -1,0 +1,13 @@
+language: python
+python:
+  - "3.5"
+install:
+  - pip install -r requirements.txt
+  - pip install matplotlib
+script: py.test
+addons:
+  apt:
+    packages:
+      - libpng-dev
+      - libjpeg8-dev
+      - libfreetype6-dev
