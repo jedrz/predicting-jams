@@ -4,10 +4,16 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install matplotlib
+  - pip install pylint
 script: py.test
+after_success:
+  - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
 addons:
   apt:
     packages:
       - libpng-dev
       - libjpeg8-dev
       - libfreetype6-dev
+cache: pip
+notifications:
+  email: false
