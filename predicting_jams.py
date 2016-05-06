@@ -93,7 +93,6 @@ def display_jam(jam, node_dict):
     display_labels(jam.in_40, 's', node_dict)
 
 
-
 def display_labels(edges, prefix, node_dict):
     for i, e in enumerate(edges):
         display_and_annote_node(node_dict[e.id1], prefix, i, True)
