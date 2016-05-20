@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from predicting_jams import *
+from context import predicting_jams
+from predicting_jams import parse
+from predicting_jams.parse import *
 
 
 def test_parse_street_graph_lines():
