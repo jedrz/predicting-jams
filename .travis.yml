@@ -5,9 +5,13 @@ install:
   - pip install -r requirements.txt
   - pip install matplotlib
   - pip install pylint
+  - pip install codecov
+  - pip install pytest-cov
 script: py.test
 after_success:
   - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
+  - py.test --cov=./
+  - codecov
 addons:
   apt:
     packages:
