@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from context import predicting_jams
-from predicting_jams import parse
 from predicting_jams.parse import *
 
 
