@@ -16,8 +16,18 @@ CREATE TABLE edge (
   FOREIGN KEY (node2_id) REFERENCES node(id)
 );
 
+-- TODO: do zastanowienia: może trzeba się też pozbyć tej tabelki jam?
 CREATE TABLE jam (
   id BIGINT PRIMARY KEY
+);
+
+-- TODO: do zastanowienia: a może skoro jam_removed, jam_20m, jam_40m są takie same, to je złączymy z jakimś dodatkowym polem - enumem?
+CREATE TABLE jam_removed (
+  jam_id BIGINT,
+  node1_id BIGINT,
+  node2_id BIGINT,
+  FOREIGN KEY (jam_id) REFERENCES jam(id),
+  FOREIGN KEY (node1_id, node2_id) REFERENCES edge(node1_id, node2_id)
 );
 
 CREATE TABLE jam_20m (
