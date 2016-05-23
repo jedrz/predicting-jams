@@ -3,7 +3,6 @@
 
 import matplotlib.pyplot as plt
 
-import predicting_jams.parse
 from predicting_jams.parse import parse_street_graph, parse_jams_data
 
 
@@ -49,3 +48,7 @@ def display(should_display_map=False, should_display_jam=True, jam_index=0):
     if should_display_jam:
         display_jam(jam, node_dict)
     plt.show()
+
+
+if __name__ == '__main__':
+    display()

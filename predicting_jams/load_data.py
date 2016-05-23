@@ -26,7 +26,7 @@ def main():
 
     jams = parse_jams_data()
     jam_id = 1
-    print "Inserting jams."
+    print("Inserting jams.")
     for jam in jams:
         print("Inserting jam {}.".format(jam_id))
         cursor.execute("INSERT INTO jam (id) VALUES ({})".format(jam_id))
