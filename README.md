@@ -23,6 +23,10 @@ and then:
 ```bash
 create database "predicting-jams" owner docker encoding 'UTF8' template template_postgis;
 ```
+and then switch to newly created database:
+```bash
+\c "predicting-jams"
+```
 To create schema connect to *predicting-jams* using psql from project root directory and then type:
 ```bash
 \i sql/create.sql
