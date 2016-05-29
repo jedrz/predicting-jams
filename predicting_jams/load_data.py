@@ -34,12 +34,12 @@ def main():
     for jam in jams:
         print("Inserting jam {}.".format(jam_id))
         cursor.execute("INSERT INTO jam (id) VALUES ({})".format(jam_id))
-        for removed in jam.removed:
-            cursor.execute("INSERT INTO jam_removed (jam_id, node1_id, node2_id) VALUES ({}, {}, {})".format(jam_id, removed.id1, removed.id2))
-        for in_20 in jam.in_20:
-            cursor.execute("INSERT INTO jam_20m (jam_id, node1_id, node2_id) VALUES ({}, {}, {})".format(jam_id, in_20.id1, in_20.id2))
-        for in_40 in jam.in_40:
-            cursor.execute("INSERT INTO jam_40m (jam_id, node1_id, node2_id) VALUES ({}, {}, {})".format(jam_id, in_40.id1, in_40.id2))
+        for i, removed in enumerate(jam.removed):
+            cursor.execute("INSERT INTO jam_removed (jam_id, event_id, node1_id, node2_id) VALUES ({}, {}, {}, {})".format(jam_id, i, removed.id1, removed.id2))
+        for i, in_20 in enumerate(jam.in_20):
+            cursor.execute("INSERT INTO jam_20m (jam_id, event_id, node1_id, node2_id) VALUES ({}, {}, {}, {})".format(jam_id, i, in_20.id1, in_20.id2))
+        for i, in_40 in enumerate(jam.in_40):
+            cursor.execute("INSERT INTO jam_40m (jam_id, event_id, node1_id, node2_id) VALUES ({}, {}, {}, {})".format(jam_id, i, in_40.id1, in_40.id2))
         jam_id += 1
     conn.commit()
     print("Inserting jams finished.")

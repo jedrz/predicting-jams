@@ -24,6 +24,7 @@ CREATE TABLE jam (
 -- TODO: do zastanowienia: a może skoro jam_removed, jam_20m, jam_40m są takie same, to je złączymy z jakimś dodatkowym polem - enumem?
 CREATE TABLE jam_removed (
   jam_id BIGINT,
+  event_id BIGINT,
   node1_id BIGINT,
   node2_id BIGINT,
   FOREIGN KEY (jam_id) REFERENCES jam(id),
@@ -32,6 +33,7 @@ CREATE TABLE jam_removed (
 
 CREATE TABLE jam_20m (
   jam_id BIGINT,
+  event_id BIGINT,
   node1_id BIGINT,
   node2_id BIGINT,
   FOREIGN KEY (jam_id) REFERENCES jam(id),
@@ -40,6 +42,7 @@ CREATE TABLE jam_20m (
 
 CREATE TABLE jam_40m (
   jam_id BIGINT,
+  event_id BIGINT,
   node1_id BIGINT,
   node2_id BIGINT,
   FOREIGN KEY (jam_id) REFERENCES jam(id),
