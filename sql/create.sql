@@ -45,3 +45,11 @@ CREATE TABLE jam_40m (
   FOREIGN KEY (jam_id) REFERENCES jam(id),
   FOREIGN KEY (node1_id, node2_id) REFERENCES edge(node1_id, node2_id)
 );
+
+CREATE TABLE jam_train (
+  id BIGINT PRIMARY KEY
+);
+
+CREATE TABLE jam_test (
+  id BIGINT PRIMARY KEY
+);
