@@ -59,6 +59,13 @@ def main():
     conn.commit()
     print("Splitting jams finished.")
 
+    print("Refreshing train views.")
+    cursor.execute("REFRESH MATERIALIZED VIEW jam_removed_train")
+    cursor.execute("REFRESH MATERIALIZED VIEW jam_20m_train")
+    cursor.execute("REFRESH MATERIALIZED VIEW jam_40m_train")
+    conn.commit()
+    print("Refreshing train views finished.")
+
 
 if __name__ == "__main__":
     main()

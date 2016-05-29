@@ -56,3 +56,15 @@ CREATE TABLE jam_train (
 CREATE TABLE jam_test (
   id BIGINT PRIMARY KEY
 );
+
+CREATE MATERIALIZED VIEW jam_removed_train AS
+  SELECT * FROM jam_removed
+  WHERE jam_id IN (SELECT id FROM jam_train);
+
+CREATE MATERIALIZED VIEW jam_20m_train AS
+  SELECT * FROM jam_20m
+  WHERE jam_id IN (SELECT id FROM jam_train);
+
+CREATE MATERIALIZED VIEW jam_40m_train AS
+  SELECT * FROM jam_40m
+  WHERE jam_id IN (SELECT id FROM jam_train);
