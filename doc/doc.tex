@@ -15,14 +15,31 @@
 \begin{document}
 
 \title{Predicting Jams\\%
-{\large czyli przewidywanie korków samochodowych} }
+{\large czyli model prognozujący tworzenie się korków samochodowych} }
 
 \author{Łukasz Jędrzejewski \and Artur Sawicki}
 
 \maketitle
 
 \section{Opis projektu}
-W ramach projektu realizujemy...
+W ramach projektu realizowaliśmy zadanie polegające na zbudowaniu modelu prognozującego tworzenie się korków na podstawie historychnych obserwacji. Zadanie opiera się na zadaniu ze strony \href{http://tunedit.org/challenge/IEEE-ICDM-2010/jams}{tunedit.org}.
+
+Do realizacji celów zadania użyliśmy bazy danych \href{https://www.postgresql.org/}{PostgreSQL} rozszerzonej o dodatek umożliwiający pracę z danymi przestrzennymi \href{http://postgis.net/}{PostGIS}. Aby ułatwić pracę na różnych maszynach, baza danych wraz z rozszerzeniem zainstalowana jest na kontenerze typu \href{https://www.docker.com/}{docker}. Skrypty odpowiadające za stworzenie schematu w bazie danych, przetwarzanie i wizualizację danych oraz właściwe obliczenia napisaliśmy w języku \href{https://www.python.org/}{python}.
+
+\section{Opis problemu}
+\subsection{Wprowadzenie}
+Stacje radiowe wpadły na pomysł zbierania informacji dotyczących zatłoczenia ulic oraz przekazywanie ich do kierowców, w celu umożliwienia im omijania nieprzejezdnych dróg. Takie dane można użyć też w inny sposób - na ich podstawie można przewidzieć, gdzie mogą pojawić się kolejne korki, bazując na początkowym stopniu zatłoczenia ulic. Tego właśnie dotyczy zadanie.
+
+\subsection{Dane}
+Dane użyte w zadaniu wygenerowane zostały z jedno-godzinnych symulacji. Każda z nich zaczynała się prawie pustą siecią dróg, do której dodawane są samochody, z losowo wybranym punktem startu i docelowym.
+
+Na początku każdej symulacji 5 losowych odcinków dróg (2 główne i 3 mniejsze) zostawało usuniętych z grafu imitując roboty drogowe. Jako dane wejściowe algorytm dostaje identyfikatory 5 usuniętych dróg oraz sekwencję identyfikatorów dróg, na których korek pojawił się w ciągu pierwszych 20 minut symulacji. Zadaniem jest przewidzenie korków w następnych 40 minutach.
+
+Odcinek uznajemy za zakorkowany kiedy średnia prędkość w ciągu ostatnich 6 minut nie przekroczyła 5km/h, a liczba samochodów jaka przejchała lub znajduje się na nim jest większa niż 10.
+
+Zbiór treningowy i zbiór testowy zawierają po 5000 próbek, z których każda jest pojedynczą symulacją. Dane treningowe zawierają pierwsze 20 minut symulacji oraz kolejne 40 minut, natomiast dane testowe - tylko pierwsze 20 minut.
+
+Dostępny jest także graf ulic.
 
 \scriptsize
 \begin{verbatim}
