@@ -6,6 +6,8 @@ from collections import namedtuple
 
 STREET_GRAPH_PATH = 'data/street_graph.txt'
 JAMS_TRAINING_PATH = 'data/jams_training.txt'
+JAMS_TRAINING_09_PATH = 'data/jams_training_0.9.txt'
+JAMS_TRAINING_01_PATH = 'data/jams_training_0.1.txt'
 
 
 Point = namedtuple('Point', ['id', 'lat', 'long'])
@@ -47,9 +49,21 @@ def parse_edge(elements):
                 max_velocity=int(elements[4]))
 
 
-def parse_jams_data():
-    with open(JAMS_TRAINING_PATH) as f:
+def _parse_jams_data_file(path):
+    with open(path) as f:
         return parse_jams_data_lines(f.readlines())
+
+
+def parse_jams_data():
+    return _parse_jams_data_file(JAMS_TRAINING_PATH)
+
+
+def parse_jams_09_data():
+    return _parse_jams_data_file(JAMS_TRAINING_09_PATH)
+
+
+def parse_jams_01_data():
+    return _parse_jams_data_file(JAMS_TRAINING_01_PATH)
 
 
 def parse_jams_data_lines(lines):

@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from collections import namedtuple
+import math
 
 from predicting_jams import db
+from predicting_jams import parse
 from predicting_jams.parse import Jam
 
 
@@ -64,3 +66,89 @@ def query_closest_segments(edge):
     """.format(node1_geom=node1_geom,
                node2_geom=node2_geom,
                event_id=edge.event_id))
+
+
+def weight_segments(test_segments, train_segments):
+    p = 10
+    return 1 / math.log((abs(len(test_segments) - len(train_segments)) + p), p)
+
+
+def similarity_segments(test_segments, train_segments):
+    similarity = 0
+    segments_len = len(test_segments)
+    for train_index, train_segment in enumerate(train_segments):
+        if train_segment in test_segments:
+            test_index = test_segments.index(train_segment)
+            similarity += segments_len - abs(test_index - train_index)
+    return weight_segments(test_segments, train_segments) * similarity
+
+
+def sort_jams_by_similarity(segments, jams):
+    #return list(reversed(sorted([similarity_segments(segments, jam.in_20) for jam in jams])))
+    return sorted(jams, key=lambda jam: similarity_segments(segments, jam.in_20), reverse=True)
+
+
+def extract_in_40_segments(jams):
+    return set([segment
+                for jam in jams
+                for segment in jam.in_40])
+
+
+def predict_length(jams):
+    lengths = [len(jam.in_40) for jam in jams]
+    return round(sum(lengths) / len(lengths))
+
+
+def compute_mean_position(segment, jams):
+    positions = [jam.in_40.index(segment) for jam in jams if segment in jam.in_40]
+    return sum(positions) / len(positions)
+
+
+def compute_frequency(segment, jams):
+    return len(list(filter(lambda jam: segment in jam.in_40, jams)))
+
+
+def build_mean_positions_dict(segments, jams):
+    return {segment: compute_mean_position(segment, jams)
+            for segment in segments}
+
+
+def build_frequencies_dict(segments, jams):
+    return {segment: compute_frequency(segment, jams)
+            for segment in segments}
+
+
+# FIXME: return sth if no segments at position.
+def get_possible_segments_at_position(position, mean_positions):
+    return [segment
+            for segment, mean_position in mean_positions.items()
+            if round(mean_position) == position + 1]
+
+
+def predict_segment(segments, frequencies):
+    return list(sorted(segments, key=lambda segment: frequencies[segment]))[-1]
+
+
+def predict_from_jams(jams):
+    all_in_40_segments = extract_in_40_segments(jams)
+    length = predict_length(jams[:(len(jams) // 10)])
+    all_mean_positions = build_mean_positions_dict(all_in_40_segments, jams)
+    all_frequencies = build_frequencies_dict(all_in_40_segments, jams)
+    return [
+        predict_segment(
+            get_possible_segments_at_position(position, all_mean_positions),
+            all_frequencies
+        )
+        for position in range(length)
+    ]
+
+
+def predict(jam):
+    jams = parse.parse_jams_09_data()
+    ranked_jams = sort_jams_by_similarity(jam.in_20, jams)
+    return predict_from_jams(ranked_jams[:200])
+
+
+def predict_and_evaluate(jam):
+    predicted_in_40 = predict(jam)
+    return quality(predicted_in_40, jam.in_40)
