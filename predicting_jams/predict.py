@@ -69,9 +69,17 @@ def query_closest_segments(edge):
                event_id=edge.event_id))
 
 
+## Parameters
+WEIGHT_LOG_BASE = 10
+MINIMUM_POSSIBLE_SEGMENTS = 1
+AROUND_POSITION_OFFSET = -1
+LENGTH_PREDICT_BEST_JAMS_RATIO = 0.1
+REMOVE_SEGMENT_AFTER_USE = True
+PREDICT_FROM_FIRST_BEST_JAMS = 200
+
+
 def weight_segments(test_segments, train_segments):
-    p = 10
-    return 1 / math.log((abs(len(test_segments) - len(train_segments)) + p), p)
+    return 1 / math.log((abs(len(test_segments) - len(train_segments)) + WEIGHT_LOG_BASE), WEIGHT_LOG_BASE)
 
 
 def similarity_segments(test_segments, train_segments):
@@ -80,6 +88,7 @@ def similarity_segments(test_segments, train_segments):
     for train_index, train_segment in enumerate(train_segments):
         if train_segment in test_segments:
             test_index = test_segments.index(train_segment)
+            ## Can be tuned.
             similarity += segments_len - abs(test_index - train_index)
     return weight_segments(test_segments, train_segments) * similarity
 
@@ -122,13 +131,13 @@ def build_frequencies_dict(segments, jams):
 def get_segments_around_position(position, mean_positions):
     return [segment
             for segment, mean_position in mean_positions.items()
-            if round(mean_position) == position + 1]
+            if round(mean_position) + AROUND_POSITION_OFFSET == position]
 
 
 def get_possible_segments_at_position(position, mean_positions):
     segments = get_segments_around_position(position, mean_positions)
     position_diff = 1
-    while not segments:
+    while len(segments) < MINIMUM_POSSIBLE_SEGMENTS:
         segments += get_segments_around_position(position + position_diff, mean_positions)
         segments += get_segments_around_position(position - position_diff, mean_positions)
         position_diff += 1
@@ -141,21 +150,22 @@ def predict_segment(segments, frequencies):
 
 def predict_from_jams(jams):
     all_in_40_segments = extract_in_40_segments(jams)
-    length = predict_length(jams[:(len(jams) // 10)])
+    length = predict_length(jams[:int(len(jams) * LENGTH_PREDICT_BEST_JAMS_RATIO)])
     all_mean_positions = build_mean_positions_dict(all_in_40_segments, jams)
     all_frequencies = build_frequencies_dict(all_in_40_segments, jams)
     in_40 = []
     for position in range(length):
         possible_segments = get_possible_segments_at_position(position, all_mean_positions)
         segment = predict_segment(possible_segments, all_frequencies)
-        del all_mean_positions[segment]
+        if REMOVE_SEGMENT_AFTER_USE:
+            del all_mean_positions[segment]
         in_40.append(segment)
     return in_40
 
 
 def predict(jam, train_jams=parse.parse_jams_09_data()):
     ranked_jams = sort_jams_by_similarity(jam.in_20, train_jams)
-    return predict_from_jams(ranked_jams[:200])
+    return predict_from_jams(ranked_jams[:PREDICT_FROM_FIRST_BEST_JAMS])
 
 
 def predict_and_evaluate(jam, train_jams=parse.parse_jams_09_data()):
