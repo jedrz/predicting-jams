@@ -18,6 +18,10 @@ addons:
       - libpng-dev
       - libjpeg8-dev
       - libfreetype6-dev
+      - libblas-dev
+      - liblapack-dev
+      - gfortran
+
 cache: pip
 notifications:
   email: false
