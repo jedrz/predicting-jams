@@ -144,13 +144,13 @@ def predict_from_jams(jams):
     length = predict_length(jams[:(len(jams) // 10)])
     all_mean_positions = build_mean_positions_dict(all_in_40_segments, jams)
     all_frequencies = build_frequencies_dict(all_in_40_segments, jams)
-    return [
-        predict_segment(
-            get_possible_segments_at_position(position, all_mean_positions),
-            all_frequencies
-        )
-        for position in range(length)
-    ]
+    in_40 = []
+    for position in range(length):
+        possible_segments = get_possible_segments_at_position(position, all_mean_positions)
+        segment = predict_segment(possible_segments, all_frequencies)
+        del all_mean_positions[segment]
+        in_40.append(segment)
+    return in_40
 
 
 def predict(jam):
