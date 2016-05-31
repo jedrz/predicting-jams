@@ -10,7 +10,7 @@ def build_node_dict(nodes):
     return {n.id: n for n in nodes}
 
 
-def display_map(node_dict, edges):
+def display_map(node_dict, edges, should_display_edges=True):
     x = []
     y = []
     for e in edges:
@@ -18,7 +18,8 @@ def display_map(node_dict, edges):
         n2 = node_dict[e.id2]
         x.extend([n1.long, n2.long])
         y.extend([n1.lat, n2.lat])
-    plt.plot(x, y, '.-', c='g')
+    linestyle = 'solid' if should_display_edges else 'None'
+    plt.plot(x, y, '.-', c='g', linestyle=linestyle)
 
 
 def display_jam(jam, node_dict):
@@ -39,12 +40,15 @@ def display_and_annote_node(node, prefix, index, should_annotate):
         plt.annotate('{}{}'.format(prefix, index), (node.long, node.lat))
 
 
-def display(should_display_map=False, should_display_jam=True, jam_index=0):
+def display(should_display_map=False,
+            should_display_edges=False,
+            should_display_jam=True,
+            jam_index=0):
     (nodes, edges) = parse_street_graph()
     jam = parse_jams_data()[jam_index]
     node_dict = build_node_dict(nodes)
     if should_display_map:
-        display_map(node_dict, edges)
+        display_map(node_dict, edges, should_display_edges=should_display_edges)
     if should_display_jam:
         display_jam(jam, node_dict)
     plt.show()
