@@ -76,6 +76,8 @@ Powyższe dane zwizualizowaliśmy. Nie miało to wpływu na predykcję, jednak p
 
 Udostępniony zbiór treningowy zawierających 5000 symulacji podzieliśmy na~dwa zbiór treningowy składający się z~4500 symulacji oraz zbiór testowy zawierających 500 przykładów. Nie zdecydowaliśmy się skorzystać z~zamieszczonego na~stronie zadania zbioru testowego, ponieważ zawierał on~tylko dane z~20 pierwszych minut. W~związku z~tym do~oceny zbudowanego modelu używamy części danych treningowych.
 
+Po~wizualizacji kilkunastu korków, okazało się że~mają one raczej charakter globalny. Nie widać wyraźnej reguły, że~korki w~pewnym segmencie ulicy, przeniosą się na~segment, który jest nieopodal. Tak może się w~ogóle nie stać. W~związku z~tym wymusiło to~przemyślenie rozwiązania, które nie będzie opierało się przede wszystkim na~aspekcie geograficznym, a~w~dużym stopniu korzystało ze~zbioru treningowego.
+
 \subsection{Ocena rozwiązania}
 
 Do~oceny poprawności predykcji korków w~ciągu kolejnych 40~minut, wykorzystaliśmy miarę zaproponowaną przez pomysłodawców zadania. Została ona użyta do~oceny rozwiązań zgłoszonych w~trakcie trwania konkursu w~2010 roku.
@@ -100,7 +102,49 @@ Tak zdefiniowana formuła oceny posiada kilka cech. Najważniejszą wydaje się 
 
 \subsection{Algorytm}
 
+W~algorytmie predykcji zakorkowanych segmentów dróg można wyróżnić dwa główne etapy:
+
+\begin{enumerate}
+\item Wybór najbardziej podobnych korków w~pierwszych 20~minutach, dla danych segmentów dróg zakorkowanych w~pierwszych 20 minutach.
+\item Na~podstawie $n$ najlepszych korków z~danych treningowych predykcja liczby segmentów zakorkowanych w~ciągu 40~minut oraz zakorkowanych segmentów.
+\end{enumerate}
+
+\paragraph{Wybór korków} Dla każdego korka w~zbiorze treningowym, oceniamy jego podobieństwo (listę zakorkowanych segmentów w~pierwszych 20~minutach) do~listy zakorkowanych segmentów w~pierwszych 20~minutach dla których chcemy dokonać predykcji.
+
+Podobieństwo obliczamy w~następujący sposób: dla każdego segmentu w~liście z~przykładu treningowego, badamy czy znajduje się on~w~liście przykładu testowego. Jeśli nie, zwiększamy podobieństwo proporcjonalnie do~odległości do~najbliższego segmentu w~liście testowej (ale ma~to~dużo mniejszy wpływ, niż gdyby się znajdował). Jeśli zaś znajduje, to~zwiększamy podobieństwo o~długość, ale pomniejszone o~różnicę pozycji w~segmentach.
+
+Na~koniec uzyskane podobieństwo każemy proporcjonalnie do~różnicy liczby segmentów. Jeśli liczba segmentów jest identyczna, podobieństwo pozostawiamy bez zmian.
+
+\paragraph{Właściwa predykcja} Posiadając posortowane korki pod względem podobieństwa, wybieramy pewną ich część do~budowy rozwiązania. Spośród wybranych najlepiej rokujących korków, wybieramy znowu pewną część, aby dokonać predykcji liczby zakorkowanych segmentów w~następnych 40~minutach. Odbywa się to~na~zasadzie obliczenia średniej arytmetycznej długości zakorkowanych segmentów z~pośród części korków.
+
+W~tym momencie pozostaje do~wykonania najtrudniejsza część, czyli predykcja kolejno zakorkowanych segmentów dróg. Na~początku budujemy dwie pomocnicze struktury -- zawierające średnią pozycję segmentu w~wybranych korkach, oraz częstość występowania. Następnie musimy wybrać najlepsze segmenty do~obsadzenia na~kolejnych pozycjach przewidywanego korka. I~tak, dla każdej pozycji, wybieramy segmenty, które znajdowały się na~podobnych pozycjach (korzystając z~pomocnicznej struktury), a~następnie spośród tak wybranych pozycji, wybieramy tą, która występowała najczęściej (tu~także korzystając z~pomocniczej struktury).
+
+\paragraph{Parametry}
+
+W~trakcie tworzenia algorytmu wyłoniło się co~najmniej kilka parametrów.
+
+\begin{enumerate}
+\item wpływ różnicy długości segmentów na~ich podobieństwo (im~różnica większa, tym bardziej karzemy podobieństwo),
+\item minimalna liczba segmentów występujących w~okolicy $i$-tej pozycji, spośród których wybierany jest najlepszy segment,
+\item przesunięcie akceptowalnej pozycji dla szukanych, segmentów na podobnych pozycjach,
+\item liczba najlepszych korków, spośród których dokonujemy predykcji,
+\item część najlepszych korków spośród najlepszych korków do~dokonania predykcji długości,
+\item czy użyty segment, powinien być usunięty po~wybraniu -- w~zadaniu segmenty się nie powtarzają, ale potencjalne użycie go~np. w~dwóch miejscach, z~których jedno jest poprawne może być lepsze niż nietrafienie na~dwóch pozycjach.
+\end{enumerate}
+
 \subsection{Wyniki}
+
+Po~pobieżnej nastawie parametrów, udało się uzyskać średni wynik, dla zestawu 500 przykładów testowych, na~poziomie 31\%.
+
+\subsection{Ulepszenia}
+
+Zaproponowane rozwiązanie na~pewno nie jest bez wad, ale widzimy kilka możliwości, godnych przeprowadzenia eksperymentu:
+
+\begin{enumerate}
+\item Inny sposób porównywania listy segmentów, tak aby w~większym stopniu brał pod uwagę dane geograficzne. Na~przykład dla segmentu, który nie znajduje się w~liście segmentów testowych, można by~wyliczyć wagę na~podstawie odległości, ale tak by~odległość wzdłuż podobnych ulic była premiowana.
+\item Wybrane, najlepsze korki do~predykcji, mogłyby być ważone, tak by~jeszcze bardziej podobne, miały większy wpływ na~predykcję. W~tej chwili są~traktowane na~równi.
+\item Optymalizacja parametrów algorytmu, tak aby zwiększyć skuteczność. Można by~użyć jednej z~wielu metod optymalizacji oraz walidacji krzyżowej, aby nie dopasować nadmiernie modelu do~danych.
+\end{enumerate}
 
 \section{Uruchamianie}
 \subsection{Baza danych}
@@ -144,12 +188,12 @@ python3 load_data.py
 \end{lstlisting}
 
 \subsection{Wizualizacja danych}
-Wizualizacja danych zawarta jest w~pliku \verb+visualize.py+. Możliwe jest wybranie kilku: wyświetlenie mapy, wyświetlenie krawędzi na~mapie, czy też samych punktów, wybranie i~wyświetlenie korku.
+Wizualizacja danych zawarta jest w~pliku \verb+visualize.py+. Możliwe jest wybranie kilku: wyświetlenie mapy, wyświetlenie krawędzi na~mapie, czy też samych punktów, wybranie i~wyświetlenie korka.
 
 \subsection{Predykcja}
 Algorytm odpowiedzialny za~predykcję znajduje się w~pliku \verb+predict+. Dla użytkownika przeznaczone są~trzy funkcje:
 \begin{enumerate}
-\item \verb+predict+ -- dla danego korku, przewiduje kolejno zakorkowane segmenty dróg w~40 minutach,
+\item \verb+predict+ -- dla danego korka, przewiduje kolejno zakorkowane segmenty dróg w~40 minutach,
 \item \verb+predict_and_evaluate+ -- robi to~samo co~funkcja \verb+predict+, ale zwraca jakość rozwiązania,
 \item \verb+validate_model+ -- ocenia jakość predykcji modelu.
 \end{enumerate}
