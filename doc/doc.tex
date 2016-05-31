@@ -5,8 +5,13 @@
 \usepackage{float}
 \usepackage{color}
 \usepackage{hyperref}
+\usepackage{listings}
 \usepackage{tikz}
 \usetikzlibrary{positioning,shapes,shadows,arrows}
+
+\lstset{
+  basicstyle=\scriptsize
+}
 
 \newcommand{\TODO}[1]{\textcolor{blue}{TODO: #1 \\}}
 \newcommand{\ang}[1]{ang.~{\itshape #1}}
@@ -119,6 +124,59 @@ Tak zdefiniowana formuła oceny posiada kilka cech. Najważniejszą wydaje się 
 \subsection{Algorytm}
 
 \subsection{Wyniki}
+
+\section{Uruchamianie}
+\subsection{Baza danych}
+Aby uruchomić bazę danych należy:
+\begin{enumerate}
+\item Zainstalować program docker dostępny na stronie \href{https://www.docker.com/}{docker.com}.
+\item Uruchomić kontener zawierający bazę PostgreSQL z rozszerzeniem PostGIS:
+\begin{lstlisting}
+sudo docker run --name "postgis" -p 25432:5432 -d -t kartoza/postgis
+\end{lstlisting}
+\item Połączyć się z bazą używając polecenia psql:
+\begin{lstlisting}
+psql -h localhost -U docker -p 25432 -d postgres
+\end{lstlisting}
+\item Włączyć dodatek:
+\begin{lstlisting}
+create extension Postgis;
+\end{lstlisting}
+\item Stworzyć bazę danych:
+\begin{lstlisting}
+create database "predicting-jams" owner docker encoding 'UTF8' template template_postgis;
+\end{lstlisting}
+\item Przełączyć się na utworzoną bazę danych:
+\begin{lstlisting}
+\c "predicting-jams"
+\end{lstlisting}
+\item Stworzyć schemat (zakładamy połączenie z bazą przez psql z głównego katalogu projektu):
+\begin{lstlisting}
+\i sql/create.sql
+\end{lstlisting}
+\item (opcjonalnie) Jeżeli będzie potrzeba zrzucenia schematu:
+\begin{lstlisting}
+\i sql/drop.sql
+\end{lstlisting}
+\end{enumerate}
+
+\subsection{Wczytywanie danych}
+Aby wczytać dane należy uruchomić bazę danych, a następnie wykonać skrypt:
+\begin{lstlisting}
+python3 load_data.py
+\end{lstlisting}
+
+\subsection{Wizualizacja danych}
+Aby zwizualizować dane należy wykonać skrypt:
+\begin{lstlisting}
+python3 visualize.py
+\end{lstlisting}
+
+\subsection{Predykcja}
+Aby dokonać predykcji:
+\begin{lstlisting}
+python3 predict.py
+\end{lstlisting}
 
 \section{Podsumowanie}
 Ale fajno...
