@@ -51,47 +51,24 @@ Dostępny jest także graf ulic.
 Na~koniec należy wspomnieć, że~zgromadzone dane dotyczą Warszawy.
 
 \subsection{Wizualizacja}
+Powyższe dane zwizualizowaliśmy. Nie miało to wpływu na predykcję, jednak pozwoliło nam obejrzeć dane, z którymi pracowaliśmy. Poniżej prezentujemy efekty.
+
+\begin{figure}[h]
+\centerline{\includegraphics[width=\textwidth]{figures/jams.png}}
+\caption{Rysunek przedstawia wszystkie korki znajdujące się w danych treningowych. Litera f oznacza korek z pierwszych 20 minut, litera s - z~kolejnych 40. Numery wyznaczają kolejność korków.}
+\end{figure}
+
+\begin{figure}[h]
+\centerline{\includegraphics[width=\textwidth]{figures/map.png}}
+\caption{Rysunek pokazuje wszystkie drogi zawarte w grafie.}
+\end{figure}
 
 \section{Model danych}
 
-% http://tex.stackexchange.com/a/124114
-\tikzstyle{entity}=[rectangle, rectangle split, rectangle split parts=2, draw=black, rounded corners, text justified, align=left]
-
-\begin{tikzpicture}[node distance=1cm]
-    \node (Node) [entity]
-        {
-            \textbf{NODE}
-            \nodepart{second}\underline{id BIGINT} \\ geometry GEOGRAPHY(POINT, 4326)
-        };
-    \node (Edge) [entity, below=of Node]
-        {
-            \textbf{EDGE}
-            \nodepart{second}\underline{node1\_id BIGINT} \\ \underline{node2\_id BIGINT} \\ distance DOUBLE PRECISION \\ lanes INT2 \\ max\_velocity DOUBLE PRECISION
-        };
-    \node (Jam) [entity, right=of Node]
-        {
-            \textbf{JAM}
-            \nodepart{second}\underline{id BIGINT}
-        };
-    
-    \node (Jam_removed) [entity, below=of Jam]
-        {
-            \textbf{JAM\_REMOVED}
-            \nodepart{second}jam\_id BIGINT \\ node1\_id BIGINT \\ node2\_id BIGINT
-        };
-    
-    \node (Jam_20m) [entity, below=of Jam_removed]
-        {
-            \textbf{JAM\_20M}
-            \nodepart{second} jam\_id BIGINT \\ node1\_id BIGINT \\ node2\_id BIGINT
-        };
-    
-    \node (Jam_40m) [entity, below=of Jam_20m]
-        {
-            \textbf{JAM\_40M}
-            \nodepart{second}jam\_id BIGINT \\ node1\_id BIGINT \\ node2\_id BIGINT
-        };
-\end{tikzpicture}
+\begin{figure}[H]
+\centerline{\includegraphics[width=\textwidth]{figures/diagram.png}}
+\caption{Model danych zaprezentowany na diagramie relacji.}
+\end{figure}
 
 \section{Predykcja}
 
