@@ -144,16 +144,15 @@ python3 load_data.py
 \end{lstlisting}
 
 \subsection{Wizualizacja danych}
-Aby zwizualizować dane należy wykonać skrypt:
-\begin{lstlisting}
-python3 visualize.py
-\end{lstlisting}
+Wizualizacja danych zawarta jest w~pliku \verb+visualize.py+. Możliwe jest wybranie kilku: wyświetlenie mapy, wyświetlenie krawędzi na~mapie, czy też samych punktów, wybranie i~wyświetlenie korku.
 
 \subsection{Predykcja}
-Aby dokonać predykcji:
-\begin{lstlisting}
-python3 predict.py
-\end{lstlisting}
+Algorytm odpowiedzialny za~predykcję znajduje się w~pliku \verb+predict+. Dla użytkownika przeznaczone są~trzy funkcje:
+\begin{enumerate}
+\item \verb+predict+ -- dla danego korku, przewiduje kolejno zakorkowane segmenty dróg w~40 minutach,
+\item \verb+predict_and_evaluate+ -- robi to~samo co~funkcja \verb+predict+, ale zwraca jakość rozwiązania,
+\item \verb+validate_model+ -- ocenia jakość predykcji modelu.
+\end{enumerate}
 
 \section{Podsumowanie}
 Zadanie pokazało jaki potencjał czai się w wykorzystywaniu przestrzennych danych i jak można używać ich do rozwiązywania szerokich zakresów problemów.
