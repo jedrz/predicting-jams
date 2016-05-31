@@ -88,7 +88,6 @@ def similarity_segments(test_segments, train_segments):
     for train_index, train_segment in enumerate(train_segments):
         if train_segment in test_segments:
             test_index = test_segments.index(train_segment)
-            ## Can be tuned.
             similarity += segments_len - abs(test_index - train_index)
     return weight_segments(test_segments, train_segments) * similarity
 
