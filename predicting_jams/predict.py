@@ -47,6 +47,7 @@ def _query_geometry(node_id):
     return db.query_one("SELECT ST_AsText(geometry) FROM node WHERE id = {}"
                         .format(node_id))[0]
 
+
 # Looks like there is a lot of identical segments...
 def query_closest_segments(edge):
     node1_geom = _query_geometry(edge.id1)
@@ -118,11 +119,20 @@ def build_frequencies_dict(segments, jams):
             for segment in segments}
 
 
-# FIXME: return sth if no segments at position.
-def get_possible_segments_at_position(position, mean_positions):
+def get_segments_around_position(position, mean_positions):
     return [segment
             for segment, mean_position in mean_positions.items()
             if round(mean_position) == position + 1]
+
+
+def get_possible_segments_at_position(position, mean_positions):
+    segments = get_segments_around_position(position, mean_positions)
+    position_diff = 1
+    while not segments:
+        segments += get_segments_around_position(position + position_diff, mean_positions)
+        segments += get_segments_around_position(position - position_diff, mean_positions)
+        position_diff += 1
+    return segments
 
 
 def predict_segment(segments, frequencies):
