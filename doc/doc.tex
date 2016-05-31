@@ -1,0 +1,90 @@
+\documentclass[a4paper,12pt]{mwart}
+
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes,shadows,arrows}
+
+\newcommand{\TODO}[1]{\textcolor{blue}{TODO: #1 \\}}
+\newcommand{\ang}[1]{ang.~{\itshape #1}}
+
+% http://tex.stackexchange.com/questions/83440/inputenc-error-unicode-char-u8-not-set-up-for-use-with-latex
+\DeclareUnicodeCharacter{00A0}{~}
+
+\begin{document}
+
+\title{Predicting Jams\\%
+{\large czyli model prognozujący tworzenie się korków samochodowych} }
+
+\author{Łukasz Jędrzejewski \and Artur Sawicki}
+
+\maketitle
+
+\section{Opis projektu}
+W ramach projektu realizowaliśmy zadanie polegające na zbudowaniu modelu prognozującego tworzenie się korków na podstawie historychnych obserwacji. Zadanie opiera się na zadaniu ze strony \href{http://tunedit.org/challenge/IEEE-ICDM-2010/jams}{tunedit.org}.
+
+Do realizacji celów zadania użyliśmy bazy danych \href{https://www.postgresql.org/}{PostgreSQL} rozszerzonej o dodatek umożliwiający pracę z danymi przestrzennymi \href{http://postgis.net/}{PostGIS}. Aby ułatwić pracę na różnych maszynach, baza danych wraz z rozszerzeniem zainstalowana jest na kontenerze typu \href{https://www.docker.com/}{docker}. Skrypty odpowiadające za stworzenie schematu w bazie danych, przetwarzanie i wizualizację danych oraz właściwe obliczenia napisaliśmy w języku \href{https://www.python.org/}{python}.
+
+\section{Opis problemu}
+\subsection{Wprowadzenie}
+Stacje radiowe wpadły na pomysł zbierania informacji dotyczących zatłoczenia ulic oraz przekazywanie ich do kierowców, w celu umożliwienia im omijania nieprzejezdnych dróg. Takie dane można użyć też w inny sposób - na ich podstawie można przewidzieć, gdzie mogą pojawić się kolejne korki, bazując na początkowym stopniu zatłoczenia ulic. Tego właśnie dotyczy zadanie.
+
+\subsection{Dane}
+Dane użyte w zadaniu wygenerowane zostały z jedno-godzinnych symulacji. Każda z nich zaczynała się prawie pustą siecią dróg, do której dodawane są samochody, z losowo wybranym punktem startu i docelowym.
+
+Na początku każdej symulacji 5 losowych odcinków dróg (2 główne i 3 mniejsze) zostawało usuniętych z grafu imitując roboty drogowe. Jako dane wejściowe algorytm dostaje identyfikatory 5 usuniętych dróg oraz sekwencję identyfikatorów dróg, na których korek pojawił się w ciągu pierwszych 20 minut symulacji. Zadaniem jest przewidzenie korków w następnych 40 minutach.
+
+Odcinek uznajemy za zakorkowany kiedy średnia prędkość w ciągu ostatnich 6 minut nie przekroczyła 5km/h, a liczba samochodów jaka przejchała lub znajduje się na nim jest większa niż 10.
+
+Zbiór treningowy i zbiór testowy zawierają po 5000 próbek, z których każda jest pojedynczą symulacją. Dane treningowe zawierają pierwsze 20 minut symulacji oraz kolejne 40 minut, natomiast dane testowe - tylko pierwsze 20 minut.
+
+Dostępny jest także graf ulic.
+
+\section{Model danych}
+
+% http://tex.stackexchange.com/a/124114
+\tikzstyle{entity}=[rectangle, rectangle split, rectangle split parts=2, draw=black, rounded corners, text justified, align=left]
+
+\begin{tikzpicture}[node distance=1cm]
+    \node (Node) [entity]
+        {
+            \textbf{NODE}
+            \nodepart{second}\underline{id BIGINT} \\ geometry GEOGRAPHY(POINT, 4326)
+        };
+    \node (Edge) [entity, below=of Node]
+        {
+            \textbf{EDGE}
+            \nodepart{second}\underline{node1\_id BIGINT} \\ \underline{node2\_id BIGINT} \\ distance DOUBLE PRECISION \\ lanes INT2 \\ max\_velocity DOUBLE PRECISION
+        };
+    \node (Jam) [entity, right=of Node]
+        {
+            \textbf{JAM}
+            \nodepart{second}\underline{id BIGINT}
+        };
+    
+    \node (Jam_removed) [entity, below=of Jam]
+        {
+            \textbf{JAM\_REMOVED}
+            \nodepart{second}jam\_id BIGINT \\ node1\_id BIGINT \\ node2\_id BIGINT
+        };
+    
+    \node (Jam_20m) [entity, below=of Jam_removed]
+        {
+            \textbf{JAM\_20M}
+            \nodepart{second} jam\_id BIGINT \\ node1\_id BIGINT \\ node2\_id BIGINT
+        };
+    
+    \node (Jam_40m) [entity, below=of Jam_20m]
+        {
+            \textbf{JAM\_40M}
+            \nodepart{second}jam\_id BIGINT \\ node1\_id BIGINT \\ node2\_id BIGINT
+        };
+\end{tikzpicture}
+
+\section{Podsumowanie}
+Ale fajno...
+
+\end{document}
