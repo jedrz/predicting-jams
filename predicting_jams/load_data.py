@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import random
-
 from predicting_jams import db
-from predicting_jams.parse import parse_street_graph, parse_jams_data
-
-
-TRAIN_DATA_RATIO = 0.95
+from predicting_jams.parse import parse_street_graph, parse_jams_09_data, parse_jams_01_data
 
 
 def main():
@@ -28,7 +23,9 @@ def main():
     conn.commit()
     print("Inserting edges finished.")
 
-    jams = parse_jams_data()
+    train_jams = parse_jams_09_data()
+    test_jams = parse_jams_01_data()
+    jams = train_jams + test_jams
     jam_id = 1
     print("Inserting jams.")
     for jam in jams:
@@ -45,13 +42,8 @@ def main():
     print("Inserting jams finished.")
 
     print("Splitting jams into train and test data.")
-    cursor.execute("SELECT id FROM jam")
-    jams_result = cursor.fetchall()
-    jam_ids = list(map(lambda row: row[0], jams_result))
-    random.shuffle(jam_ids)
-    train_data_len = int(TRAIN_DATA_RATIO * len(jam_ids))
-    train_jam_ids = sorted(jam_ids[:train_data_len])
-    test_jam_ids = sorted(jam_ids[train_data_len:])
+    train_jam_ids = range(1, len(train_jams) + 1)
+    test_jam_ids = range(len(train_jams) + 1, len(jams) + 1)
     for train_jam_id in train_jam_ids:
         cursor.execute("INSERT INTO jam_train (id) VALUES ({})".format(train_jam_id))
     for test_jam_id in test_jam_ids:

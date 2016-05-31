@@ -6,10 +6,7 @@ import math
 
 from predicting_jams import db
 from predicting_jams import parse
-from predicting_jams.parse import Jam
-
-
-OrderedEdge = namedtuple('OrderedEdge', ['id1', 'id2', 'event_id'])
+from predicting_jams.parse import Jam, SimpleEdge
 
 
 def _precision(predicted, target, i):
@@ -30,12 +27,12 @@ def get_random_example():
 
     def query_segments(table_name):
         segments = db.query_all("""
-        SELECT node1_id, node2_id, event_id
+        SELECT node1_id, node2_id
         FROM {}
         WHERE jam_id = {}
         ORDER BY event_id
         """.format(table_name, jam_id))
-        return [OrderedEdge._make(segment) for segment in segments]
+        return [SimpleEdge._make(segment) for segment in segments]
 
     removed = query_segments('jam_removed')
     in_20 = query_segments('jam_20m')
