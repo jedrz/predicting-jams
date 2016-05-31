@@ -4,6 +4,9 @@
 from collections import namedtuple
 import math
 
+import numpy
+import scipy.stats
+
 from predicting_jams import db
 from predicting_jams import parse
 from predicting_jams.parse import Jam, SimpleEdge
@@ -150,12 +153,21 @@ def predict_from_jams(jams):
     return in_40
 
 
-def predict(jam):
-    jams = parse.parse_jams_09_data()
-    ranked_jams = sort_jams_by_similarity(jam.in_20, jams)
+def predict(jam, train_jams=parse.parse_jams_09_data()):
+    ranked_jams = sort_jams_by_similarity(jam.in_20, train_jams)
     return predict_from_jams(ranked_jams[:200])
 
 
-def predict_and_evaluate(jam):
-    predicted_in_40 = predict(jam)
+def predict_and_evaluate(jam, train_jams=parse.parse_jams_09_data()):
+    predicted_in_40 = predict(jam, train_jams)
     return quality(predicted_in_40, jam.in_40)
+
+
+def validate_model():
+    train_jams = parse.parse_jams_09_data()
+    test_jams = parse.parse_jams_01_data()
+    qualities = []
+    for i, jam in enumerate(test_jams):
+        print("Evaluating jam", i)
+        qualities.append(predict_and_evaluate(jam, train_jams))
+    return scipy.stats.describe(qualities)
