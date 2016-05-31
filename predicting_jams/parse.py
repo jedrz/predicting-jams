@@ -6,6 +6,8 @@ from collections import namedtuple
 
 STREET_GRAPH_PATH = 'data/street_graph.txt'
 JAMS_TRAINING_PATH = 'data/jams_training.txt'
+JAMS_TRAINING_09_PATH = 'data/jams_training_0.9.txt'
+JAMS_TRAINING_01_PATH = 'data/jams_training_0.1.txt'
 
 
 Point = namedtuple('Point', ['id', 'lat', 'long'])
@@ -34,22 +36,34 @@ def parse_street_graph_lines(lines):
 
 
 def parse_node(elements):
-    return Point(id=elements[0],
+    return Point(id=int(elements[0]),
                  lat=float(elements[1]),
                  long=float(elements[2]))
 
 
 def parse_edge(elements):
-    return Edge(id1=elements[0],
-                id2=elements[1],
+    return Edge(id1=int(elements[0]),
+                id2=int(elements[1]),
                 distance=float(elements[2]),
                 lanes=int(elements[3]),
                 max_velocity=int(elements[4]))
 
 
-def parse_jams_data():
-    with open(JAMS_TRAINING_PATH) as f:
+def _parse_jams_data_file(path):
+    with open(path) as f:
         return parse_jams_data_lines(f.readlines())
+
+
+def parse_jams_data():
+    return _parse_jams_data_file(JAMS_TRAINING_PATH)
+
+
+def parse_jams_09_data():
+    return _parse_jams_data_file(JAMS_TRAINING_09_PATH)
+
+
+def parse_jams_01_data():
+    return _parse_jams_data_file(JAMS_TRAINING_01_PATH)
 
 
 def parse_jams_data_lines(lines):
@@ -66,5 +80,6 @@ def parse_jam_line(line):
 
 
 def parse_simple_edge(simple_edge):
-    simple_edge = simple_edge.split('_')
-    return SimpleEdge._make(simple_edge)
+    elements = simple_edge.split('_')
+    return SimpleEdge(id1=int(elements[0]),
+                      id2=int(elements[1]))

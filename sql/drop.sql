@@ -1,8 +1,13 @@
 -- use this file to drop all tables from predicting-jams database
 
+DROP MATERIALIZED VIEW IF EXISTS jam_removed_train;
+DROP MATERIALIZED VIEW IF EXISTS jam_20m_train;
+DROP MATERIALIZED VIEW IF EXISTS jam_40m_train;
 DROP TABLE IF EXISTS jam_removed;
 DROP TABLE IF EXISTS jam_20m;
 DROP TABLE IF EXISTS jam_40m;
+DROP TABLE IF EXISTS jam_train;
+DROP TABLE IF EXISTS jam_test;
 DROP TABLE IF EXISTS jam;
 DROP TABLE IF EXISTS edge;
 DROP TABLE IF EXISTS node;
