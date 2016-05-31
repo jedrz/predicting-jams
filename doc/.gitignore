@@ -3,4 +3,7 @@
 *.out
 doc.pdf
 *.*~
+*.fdb_latexmk
+*.fls
+/auto
 

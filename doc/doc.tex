@@ -43,6 +43,10 @@ Zbiór treningowy i zbiór testowy zawierają po 5000 próbek, z których każda
 
 Dostępny jest także graf ulic.
 
+Na~koniec należy wspomnieć, że~zgromadzone dane dotyczą Warszawy.
+
+\subsection{Wizualizacja}
+
 \section{Model danych}
 
 % http://tex.stackexchange.com/a/124114
@@ -83,6 +87,38 @@ Dostępny jest także graf ulic.
             \nodepart{second}jam\_id BIGINT \\ node1\_id BIGINT \\ node2\_id BIGINT
         };
 \end{tikzpicture}
+
+\section{Predykcja}
+
+\subsection{Dane}
+
+Udostępniony zbiór treningowy zawierających 5000 symulacji podzieliśmy na~dwa zbiór treningowy składający się z~4500 symulacji oraz zbiór testowy zawierających 500 przykładów. Nie zdecydowaliśmy się skorzystać z~zamieszczonego na~stronie zadania zbioru testowego, ponieważ zawierał on~tylko dane z~20 pierwszych minut. W~związku z~tym do~oceny zbudowanego modelu używamy części danych treningowych.
+
+\subsection{Ocena rozwiązania}
+
+Do~oceny poprawności predykcji korków w~ciągu kolejnych 40~minut, wykorzystaliśmy miarę zaproponowaną przez pomysłodawców zadania. Została ona użyta do~oceny rozwiązań zgłoszonych w~trakcie trwania konkursu w~2010 roku.
+
+Poniżej zamieściliśmy oryginalną formułę do~porównywania podobieństwa dwóch rozwiązań:
+
+\[quality(P, T) = \frac{1}{N}\sum_{i = 1}^N Precision(P, T, i)\]
+
+\[Precision(P, T, i) = \frac{\left | P_i \cap T_i \right |}{i}\]
+
+\[N = \max (\left | P \right |, \left | T \right |)\]
+
+gdzie:
+
+\begin{itemize}
+\item $P$, $T$ -- listy zawierające segmenty kolejno zakorkowanych dróg w~ciągu 40 minut,
+\item $P_i$, $T_i$ -- zakorkowany segment drogi na~pozycji $i$ rozwiązania,
+\item $\left | P \right |$, $\left | T \right |$ -- liczba zakorkowanych segmentów w~ciągu 40 minut.
+\end{itemize}
+
+Tak zdefiniowana formuła oceny posiada kilka cech. Najważniejszą wydaje się mocniejsze premiowanie poprawnych predykcji na~początku listy segmentów. W~szczególności, pierwszy segment będzie ma~wpływ na~ocenę wszystkich kolejnych segmentów -- zarówno w~ujęciu pozytywnym, jak i~negatywnym. Kolejną cechą jest uwzględnianie kolejności, zatem rozwiązania zawierające wszystkie dokładnie wszystkie segmenty jak rozwiązanie wzorcowe, nie otrzymają wzorcowej oceny.
+
+\subsection{Algorytm}
+
+\subsection{Wyniki}
 
 \section{Podsumowanie}
 Ale fajno...
